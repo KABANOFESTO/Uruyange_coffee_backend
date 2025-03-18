@@ -1,0 +1,10 @@
+import express from 'express';
+import subscriptionController from '../controllers/subscriptionController';
+const router = express.Router();
+
+router.post('/subscriptions', subscriptionController.createSubscription);
+router.get('/subscriptions', subscriptionController.getSubscriptions);
+router.delete('/subscriptions/:id', subscriptionController.deleteSubscription);
+router.put('/subscriptions/:id', subscriptionController.updateSubscription);
+
+export default router;

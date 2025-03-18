@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  email          String           @unique
+  password       String
+  role           String           @default("user") // Add this line
+  createdAt      DateTime         @default(now())
+  coffees        Coffee[]
+  subscriptions  Subscription[]
+  payments       Payment[]
+}
+
+model Coffee {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  image       String
+  title       String
+  description String
+  price       Float
+  createdAt   DateTime @default(now())
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Subscription {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  price       Float
+  createdAt   DateTime @default(now())
+  userId      String?  @db.ObjectId
+  user        User?    @relation(fields: [userId], references: [id])
+  payments    Payment[]
+}
+
+model Payment {
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+  email           String
+  cardNumber      String
+  expiryDate      String
+  cvv             String
+  firstName       String?
+  lastName        String?
+  address         String
+  apartment       String?
+  city            String
+  zipCode         String
+  phone           String?
+  textOffers      Boolean        @default(false)
+  planName        String
+  planPrice       Float
+  paymentDate     DateTime       @default(now())
+  userId          String?        @db.ObjectId
+  user            User?          @relation(fields: [userId], references: [id])
+  subscriptionId  String?        @db.ObjectId
+  subscription    Subscription?  @relation(fields: [subscriptionId], references: [id])
+  stripePaymentId String?        // Stripe payment ID
+  paymentMethodId String         // Add this line for payment method ID
+}
+
+model Message {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String
+  description String
+  createdAt   DateTime @default(now())
+}
