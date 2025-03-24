@@ -51,9 +51,6 @@ enum PaymentStatus {
 model Payment {
   id             String        @id @default(auto()) @map("_id") @db.ObjectId
   email          String
-  // cardNumber      String
-  // expiryDate      String
-  // cvv             String
   firstName      String?
   lastName       String?
   address        String
@@ -70,6 +67,8 @@ model Payment {
   subscriptionId String?       @db.ObjectId
   subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
   paymentMethod  String
+  coffeeType   String?
+  roastPreference String?
   status         PaymentStatus @default(PENDING)
 }
 
