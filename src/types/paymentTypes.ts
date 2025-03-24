@@ -1,21 +1,23 @@
 export interface Payment {
-    id?: string; // Optional for new payments
+    id?: string; 
     email: string;
     cardNumber: string;
     expiryDate: string;
     cvv: string;
-    firstName?: string | null; // Optional, allows undefined or null
-    lastName?: string | null;  // Optional, allows undefined or null
+    firstName?: string | null; 
+    lastName?: string | null;  
     address: string;
-    apartment?: string | null; // Optional, allows undefined or null
+    apartment?: string | null; 
     city: string;
     zipCode: string;
     phone: string;
-    textOffers?: boolean; // Optional
+    textOffers?: boolean; 
     planName: string;
     planPrice: number;
-    userId?: string | null; // Optional, allows undefined or null
-    subscriptionId?: string | null; // Optional, allows undefined or null
-    paymentDate?: string; // Optional
-    paymentMethod: string; // Required, for payment method ID
+    userId?: string | null; 
+    subscriptionId?: string | null; 
+    paymentDate?: string; 
+    paymentMethod?: string | null; 
+    coffeeType?: string | null; 
+    roastPreference?: string | null;
 }

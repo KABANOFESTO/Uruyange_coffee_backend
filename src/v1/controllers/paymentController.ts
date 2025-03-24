@@ -38,8 +38,8 @@ export const paymentController = {
           paymentId: payment.data.id, // Ensure it's valid
           userId: paymentData.userId || "unknown_user", // Default if userId is missing
         },
-        success_url: process.env.PAYMENT_SUCCESS_URL as string,
-        cancel_url: process.env.PAYMENT_CANCEL_URL as string,
+        success_url: "https://uruyange-coffee-frontend.vercel.app/complete",
+        cancel_url: "https://uruyange-coffee-frontend.vercel.app//cancel",
       });
 
       apiResponse.success(res, { sessionUrl: session.url, payment }, 201);

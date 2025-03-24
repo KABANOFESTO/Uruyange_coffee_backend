@@ -6,5 +6,6 @@ router.post('/subscriptions', subscriptionController.createSubscription);
 router.get('/subscriptions', subscriptionController.getSubscriptions);
 router.delete('/subscriptions/:id', subscriptionController.deleteSubscription);
 router.put('/subscriptions/:id', subscriptionController.updateSubscription);
+router.post('/buySubscription', subscriptionController.buySubscription);
 
 export default router;

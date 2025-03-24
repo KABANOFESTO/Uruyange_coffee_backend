@@ -49,11 +49,19 @@ const subscriptionController = {
     }
   },
 
-  buySubscription: async (req: Request, res: Response) => {
+  buySubscription: async (req: Request, res: Response): Promise<any> => {
     try {
-      const { userId, subscriptionId, type, price,address,city,zipCode,apartment } = req.body;
+      const {
+        userId,
+        subscriptionId,
+        type,
+        price,
+        address,
+        city,
+        zipCode,
+        apartment,
+      } = req.body;
 
-      // 1. Check if the subscription exists
       const subscription = await prisma.subscription.findUnique({
         where: { id: subscriptionId },
       });
@@ -87,16 +95,14 @@ const subscriptionController = {
           type,
           startDate: new Date(),
           endDate,
-          status: "PENDING", 
+          status: "PENDING",
           address,
           apartment,
           city,
-          zipCode
-
+          zipCode,
         },
       });
 
-      // 5. Process payment with Stripe
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [
@@ -106,23 +112,21 @@ const subscriptionController = {
               product_data: {
                 name: subscription.name,
               },
-              unit_amount: price * 100, 
+              unit_amount: price * 100,
             },
             quantity: 1,
           },
         ],
         mode: "payment",
         metadata: {
-          subscriptionUserId: subscriptionUser.id, 
+          subscriptionUserId: subscriptionUser.id,
           userId: userId,
           subscriptionId: subscriptionId,
           type: type,
         },
-        success_url: "http://localhost:3000/complete",
-        cancel_url: "http://localhost:3000/complete",
+        success_url: "https://uruyange-coffee-frontend.vercel.app/complete",
+        cancel_url: "https://uruyange-coffee-frontend.vercel.app/cancel",
       });
-
-      // 6. Respond with the session URL
       res.json({ sessionUrl: session.url });
     } catch (error) {
       console.error("Error buying subscription:", error);

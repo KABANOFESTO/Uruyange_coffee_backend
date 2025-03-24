@@ -3,9 +3,6 @@ import { Payment } from '../../types/paymentTypes';
 
 export interface PaymentDTO {
     email: string;
-    // cardNumber: string;
-    // expiryDate: string;
-    // cvv: string;
     firstName: string;
     lastName: string;
     address: string;
@@ -18,7 +15,9 @@ export interface PaymentDTO {
     planPrice: number;
     userId: string | null;
     subscriptionId: string | null;
-    paymentMethod: string; // Required, for payment method ID
+    paymentMethod: string | null;
+    coffeeType?: string | null;
+    roastPreference?: string | null;
 }
 
 export interface PaymentSummaryDTO {
@@ -27,14 +26,13 @@ export interface PaymentSummaryDTO {
     planName: string;
     planPrice: number;
     paymentDate?: string;
-    paymentMethod: string;  // Add this line
+    paymentMethod: string;
+    coffeeType?: string | null;
+    roastPreference?: string | null;
 }
 
 const createPaymentDTO = (payment: Payment): PaymentDTO => ({
     email: payment.email,
-    // cardNumber: payment.cardNumber,
-    // expiryDate: payment.expiryDate,
-    // cvv: payment.cvv,
     firstName: payment.firstName ?? '',
     lastName: payment.lastName ?? '',
     address: payment.address,
@@ -47,7 +45,9 @@ const createPaymentDTO = (payment: Payment): PaymentDTO => ({
     planPrice: payment.planPrice,
     userId: payment.userId ?? null,
     subscriptionId: payment.subscriptionId ?? null,
-    paymentMethod: payment.paymentMethod,
+    paymentMethod: payment.paymentMethod ?? '',
+    coffeeType: payment.coffeeType ?? undefined,
+    roastPreference: payment.roastPreference ?? undefined,
 });
 
 const getPaymentDTO = (payment: PrismaPayment): PaymentSummaryDTO => ({
@@ -56,7 +56,9 @@ const getPaymentDTO = (payment: PrismaPayment): PaymentSummaryDTO => ({
     planName: payment.planName,
     planPrice: Number(payment.planPrice),
     paymentDate: payment.paymentDate ? payment.paymentDate.toISOString() : undefined,
-    paymentMethod: payment.paymentMethod    ,
+    paymentMethod: payment.paymentMethod ?? 'Unknown',  // Provide a default if null
+    coffeeType: payment.coffeeType,
+    roastPreference: payment.roastPreference,
 });
 
 export {

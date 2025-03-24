@@ -3,7 +3,7 @@ import { createPaymentDTO, getPaymentDTO } from "../DTOs/paymentDTO";
 import Stripe from "stripe";
 import { Payment } from "../../types/paymentTypes";
 
-type PaymentData = Omit<Payment, "id" | "paymentDate" | "stripePaymentId">;
+type PaymentData = Omit<Payment, "id" | "paymentDate" | "stripePaymentId"> & { userId: string, paymentMethodId: string };
 
 const prisma = new PrismaClient();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -12,7 +12,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 
 export const createPayment = async (paymentData: PaymentData) => {
   try {
-    const payment = await prisma.payment.create({ data: paymentData });
+    const completePaymentData = {
+      ...paymentData,
+      paymentMethod: paymentData.paymentMethod || 'Unknown', // Provide a default if null
+    };
+
+    const payment = await prisma.payment.create({
+      data: completePaymentData
+    });
+
     if (payment) {
       return { success: true, data: payment };
     }
@@ -72,5 +80,5 @@ export const proceedPayment = async (data: any) => {
     console.log("session", session)
 
     return session
-  } catch (error) {}
+  } catch (error) { }
 };
