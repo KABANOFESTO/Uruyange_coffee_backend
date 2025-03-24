@@ -8,14 +8,15 @@ datasource db {
 }
 
 model User {
-  id             String           @id @default(auto()) @map("_id") @db.ObjectId
-  email          String           @unique
-  password       String
-  role           String           @default("user") // Add this line
-  createdAt      DateTime         @default(now())
-  coffees        Coffee[]
-  subscriptions  Subscription[]
-  payments       Payment[]
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  email            String             @unique
+  password         String
+  role             String             @default("user") // Add this line
+  createdAt        DateTime           @default(now())
+  coffees          Coffee[]
+  subscriptions    Subscription[]
+  payments         Payment[]
+  SubscriptionUser SubscriptionUser[]
 }
 
 model Coffee {
@@ -30,38 +31,46 @@ model Coffee {
 }
 
 model Subscription {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  price       Float
-  createdAt   DateTime @default(now())
-  userId      String?  @db.ObjectId
-  user        User?    @relation(fields: [userId], references: [id])
-  payments    Payment[]
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  price            Float
+  createdAt        DateTime           @default(now())
+  userId           String?            @db.ObjectId
+  user             User?              @relation(fields: [userId], references: [id])
+  payments         Payment[]
+  SubscriptionUser SubscriptionUser[]
+}
+
+enum PaymentStatus {
+  PENDING
+  CANCELLED
+  DELIVERED
+  PAID
 }
 
 model Payment {
-  id              String         @id @default(auto()) @map("_id") @db.ObjectId
-  email           String
-  cardNumber      String
-  expiryDate      String
-  cvv             String
-  firstName       String?
-  lastName        String?
-  address         String
-  apartment       String?
-  city            String
-  zipCode         String
-  phone           String?
-  textOffers      Boolean        @default(false)
-  planName        String
-  planPrice       Float
-  paymentDate     DateTime       @default(now())
-  userId          String?        @db.ObjectId
-  user            User?          @relation(fields: [userId], references: [id])
-  subscriptionId  String?        @db.ObjectId
-  subscription    Subscription?  @relation(fields: [subscriptionId], references: [id])
-  stripePaymentId String?        // Stripe payment ID
-  paymentMethodId String         // Add this line for payment method ID
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  email          String
+  // cardNumber      String
+  // expiryDate      String
+  // cvv             String
+  firstName      String?
+  lastName       String?
+  address        String
+  apartment      String?
+  city           String
+  zipCode        String
+  phone          String?
+  textOffers     Boolean       @default(false)
+  planName       String
+  planPrice      Float
+  paymentDate    DateTime      @default(now())
+  userId         String?       @db.ObjectId
+  user           User?         @relation(fields: [userId], references: [id])
+  subscriptionId String?       @db.ObjectId
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  paymentMethod  String
+  status         PaymentStatus @default(PENDING)
 }
 
 model Message {
@@ -70,4 +79,32 @@ model Message {
   email       String
   description String
   createdAt   DateTime @default(now())
+}
+
+model SubscriptionUser {
+  id             String             @id @default(auto()) @map("_id") @db.ObjectId
+  status         SubscriptionStatus @default(ACTIVE)
+  startDate      DateTime           @default(now())
+  endDate        DateTime
+  type           SubscriptionType
+  address        String
+  apartment      String?
+  city           String
+  zipCode        String
+  phone          String?
+  userId         String             @db.ObjectId
+  user           User               @relation(fields: [userId], references: [id])
+  subscriptionId String             @db.ObjectId
+  subscription   Subscription       @relation(fields: [subscriptionId], references: [id])
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  PENDING
+}
+
+enum SubscriptionType {
+  GROUND
+  WHOLE
 }

@@ -17,6 +17,5 @@ export interface Payment {
     userId?: string | null; // Optional, allows undefined or null
     subscriptionId?: string | null; // Optional, allows undefined or null
     paymentDate?: string; // Optional
-    stripePaymentId?: string; // Optional, for Stripe payment ID
-    paymentMethodId: string; // Required, for payment method ID
+    paymentMethod: string; // Required, for payment method ID
 }

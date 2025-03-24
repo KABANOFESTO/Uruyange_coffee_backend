@@ -3,9 +3,9 @@ import { Payment } from '../../types/paymentTypes';
 
 export interface PaymentDTO {
     email: string;
-    cardNumber: string;
-    expiryDate: string;
-    cvv: string;
+    // cardNumber: string;
+    // expiryDate: string;
+    // cvv: string;
     firstName: string;
     lastName: string;
     address: string;
@@ -18,7 +18,7 @@ export interface PaymentDTO {
     planPrice: number;
     userId: string | null;
     subscriptionId: string | null;
-    paymentMethodId: string; // Required, for payment method ID
+    paymentMethod: string; // Required, for payment method ID
 }
 
 export interface PaymentSummaryDTO {
@@ -27,15 +27,14 @@ export interface PaymentSummaryDTO {
     planName: string;
     planPrice: number;
     paymentDate?: string;
-    stripePaymentId?: string; // Add this line
-    paymentMethodId: string;  // Add this line
+    paymentMethod: string;  // Add this line
 }
 
 const createPaymentDTO = (payment: Payment): PaymentDTO => ({
     email: payment.email,
-    cardNumber: payment.cardNumber,
-    expiryDate: payment.expiryDate,
-    cvv: payment.cvv,
+    // cardNumber: payment.cardNumber,
+    // expiryDate: payment.expiryDate,
+    // cvv: payment.cvv,
     firstName: payment.firstName ?? '',
     lastName: payment.lastName ?? '',
     address: payment.address,
@@ -48,7 +47,7 @@ const createPaymentDTO = (payment: Payment): PaymentDTO => ({
     planPrice: payment.planPrice,
     userId: payment.userId ?? null,
     subscriptionId: payment.subscriptionId ?? null,
-    paymentMethodId: payment.paymentMethodId,
+    paymentMethod: payment.paymentMethod,
 });
 
 const getPaymentDTO = (payment: PrismaPayment): PaymentSummaryDTO => ({
@@ -57,8 +56,7 @@ const getPaymentDTO = (payment: PrismaPayment): PaymentSummaryDTO => ({
     planName: payment.planName,
     planPrice: Number(payment.planPrice),
     paymentDate: payment.paymentDate ? payment.paymentDate.toISOString() : undefined,
-    stripePaymentId: payment.stripePaymentId ?? undefined,
-    paymentMethodId: payment.paymentMethodId,
+    paymentMethod: payment.paymentMethod    ,
 });
 
 export {
