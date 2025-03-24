@@ -38,8 +38,8 @@ export const paymentController = {
           paymentId: payment.data.id, // Ensure it's valid
           userId: paymentData.userId || "unknown_user", // Default if userId is missing
         },
-        success_url: "http://localhost:3000/complete",
-        cancel_url: "http://localhost:3000/complete",
+        success_url: process.env.PAYMENT_SUCCESS_URL as string,
+        cancel_url: process.env.PAYMENT_CANCEL_URL as string,
       });
 
       apiResponse.success(res, { sessionUrl: session.url, payment }, 201);

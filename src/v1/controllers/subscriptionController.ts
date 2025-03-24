@@ -51,7 +51,7 @@ const subscriptionController = {
 
   buySubscription: async (req: Request, res: Response) => {
     try {
-      const { userId, subscriptionId, type, price } = req.body;
+      const { userId, subscriptionId, type, price,address,city,zipCode,apartment } = req.body;
 
       // 1. Check if the subscription exists
       const subscription = await prisma.subscription.findUnique({
@@ -88,6 +88,11 @@ const subscriptionController = {
           startDate: new Date(),
           endDate,
           status: "PENDING", 
+          address,
+          apartment,
+          city,
+          zipCode
+
         },
       });
 
