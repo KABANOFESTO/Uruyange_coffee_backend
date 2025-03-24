@@ -3,7 +3,7 @@ import { createPaymentDTO, getPaymentDTO } from "../DTOs/paymentDTO";
 import Stripe from "stripe";
 import { Payment } from "../../types/paymentTypes";
 
-type PaymentData = Omit<Payment, "id" | "paymentDate" | "stripePaymentId">;
+type PaymentData = Omit<Payment, "id" | "paymentDate" | "stripePaymentId"> & { userId: string, paymentMethodId: string };
 
 const prisma = new PrismaClient();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
