@@ -56,7 +56,7 @@ const getPaymentDTO = (payment: PrismaPayment): PaymentSummaryDTO => ({
     planName: payment.planName,
     planPrice: Number(payment.planPrice),
     paymentDate: payment.paymentDate ? payment.paymentDate.toISOString() : undefined,
-    paymentMethod: payment.paymentMethod ?? 'Unknown',  // Provide a default if null
+    paymentMethod: payment.paymentMethod ?? 'Unknown',
     coffeeType: payment.coffeeType,
     roastPreference: payment.roastPreference,
 });

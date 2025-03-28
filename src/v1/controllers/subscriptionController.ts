@@ -133,6 +133,30 @@ const subscriptionController = {
       res.status(500).json({ message: "Error buying subscription", error });
     }
   },
+
+  getBoughtSubscription: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { userId } = req.params;
+      
+      // Get all subscriptions bought by the user with subscription details
+      const boughtSubscriptions = await prisma.subscriptionUser.findMany({
+        where: {
+          userId,
+        },
+        include: {
+          subscription: true, // Include the related subscription details
+        },
+        orderBy: {
+          startDate: 'desc', // Order by most recent first
+        },
+      });
+
+      res.status(200).json(boughtSubscriptions);
+    } catch (error) {
+      console.error("Error fetching bought subscriptions:", error);
+      res.status(500).json({ message: "Error fetching bought subscriptions", error });
+    }
+  },
 };
 
 export default subscriptionController;
