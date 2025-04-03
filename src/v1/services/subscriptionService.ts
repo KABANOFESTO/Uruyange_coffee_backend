@@ -16,10 +16,18 @@ const subscriptionService = {
     },
 
     deleteSubscription: async (id: string): Promise<void> => {
+        // Validate that id is a valid ObjectId before proceeding
+        if (!id || id.length !== 24) {
+            throw new Error("Invalid subscription ID format");
+        }
         await prisma.subscription.delete({ where: { id } });
     },
 
     updateSubscription: async (id: string, subscriptionData: any) => {
+        // Validate that id is a valid ObjectId before proceeding
+        if (!id || id.length !== 24) {
+            throw new Error("Invalid subscription ID format");
+        }
         const updatedSubscription = await prisma.subscription.update({
             where: { id },
             data: subscriptionData
@@ -37,6 +45,14 @@ const subscriptionService = {
         zipCode?: string;
         apartment?: string;
     }) => {
+        // Validate that IDs are valid ObjectIds before proceeding
+        if (!subscriptionUserData.userId || subscriptionUserData.userId.length !== 24) {
+            throw new Error("Invalid user ID format");
+        }
+        if (!subscriptionUserData.subscriptionId || subscriptionUserData.subscriptionId.length !== 24) {
+            throw new Error("Invalid subscription ID format");
+        }
+
         // Get subscription details to calculate end date
         const subscription = await prisma.subscription.findUnique({
             where: { id: subscriptionUserData.subscriptionId }
@@ -57,25 +73,33 @@ const subscriptionService = {
         }
 
         // Create the subscription user record
-        const subscriptionUser = await prisma.subscriptionUser.create({
-            data: {
-                userId: subscriptionUserData.userId,
-                subscriptionId: subscriptionUserData.subscriptionId,
-                type: subscriptionUserData.type,
-                startDate: new Date(),
-                endDate,
-                status: "PENDING",
-                address: subscriptionUserData.address ?? "",
-                apartment: subscriptionUserData.apartment,
-                city: subscriptionUserData.city ?? "",
-                zipCode: subscriptionUserData.zipCode ?? ""
-            }
-        });
-
-        return subscriptionUser;
+        try {
+            const subscriptionUser = await prisma.subscriptionUser.create({
+                data: {
+                    userId: subscriptionUserData.userId,
+                    subscriptionId: subscriptionUserData.subscriptionId,
+                    type: subscriptionUserData.type,
+                    startDate: new Date(),
+                    endDate,
+                    status: "PENDING",
+                    address: subscriptionUserData.address ?? "",
+                    apartment: subscriptionUserData.apartment,
+                    city: subscriptionUserData.city ?? "",
+                    zipCode: subscriptionUserData.zipCode ?? ""
+                }
+            });
+            return subscriptionUser;
+        } catch (error) {
+            console.error("Error creating subscription:", error);
+            throw new Error("Error buying subscription");
+        }
     },
 
     getBoughtSubscriptions: async (userId: string) => {
+        // Validate that id is a valid ObjectId before proceeding
+        if (!userId || userId.length !== 24) {
+            throw new Error("Invalid user ID format");
+        }
         const subscriptions = await prisma.subscriptionUser.findMany({
             where: { userId },
             include: {
@@ -88,15 +112,11 @@ const subscriptionService = {
         return subscriptions;
     },
 
-    // updateSubscriptionStatus: async (subscriptionUserId: string, status: string) => {
-    //     const updatedSubscription = await prisma.subscriptionUser.update({
-    //         where: { id: subscriptionUserId },
-    //         data: { status: status as SubscriptionStatus } 
-    //     });
-    //     return updatedSubscription;
-    // },
-
     getSubscriptionUserById: async (id: string) => {
+        // Validate that id is a valid ObjectId before proceeding
+        if (!id || id.length !== 24) {
+            throw new Error("Invalid subscription user ID format");
+        }
         return await prisma.subscriptionUser.findUnique({
             where: { id },
             include: {
@@ -104,7 +124,6 @@ const subscriptionService = {
                 user: {
                     select: {
                         id: true,
-                        // name: true, // Removed or replaced with a valid property
                         email: true
                     }
                 }
@@ -113,6 +132,10 @@ const subscriptionService = {
     },
 
     checkActiveSubscription: async (userId: string) => {
+        // Validate that id is a valid ObjectId before proceeding
+        if (!userId || userId.length !== 24) {
+            throw new Error("Invalid user ID format");
+        }
         const currentDate = new Date();
         return await prisma.subscriptionUser.findFirst({
             where: {
