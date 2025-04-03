@@ -54,6 +54,7 @@ const subscriptionController = {
       const {
         userId,
         subscriptionId,
+        subscriptionType,
         type,
         price,
         address,
@@ -62,15 +63,23 @@ const subscriptionController = {
         apartment,
       } = req.body;
 
-      const subscription = await prisma.subscription.findUnique({
-        where: { id: subscriptionId },
+      // Validate required fields
+      if (!userId || !subscriptionId || !price) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      // Find subscription by name only (since ID lookup is causing issues)
+      const subscription = await prisma.subscription.findFirst({
+        where: {
+          name: subscriptionType?.name
+        },
       });
 
       if (!subscription) {
         return res.status(404).json({ message: "Subscription not found" });
       }
 
-      // 2. Check if the user exists
+      // Check if the user exists
       const user = await prisma.user.findUnique({
         where: { id: userId },
       });
@@ -79,19 +88,23 @@ const subscriptionController = {
         return res.status(404).json({ message: "User not found" });
       }
 
+      // Calculate end date based on subscription type
       let endDate = new Date();
-      if (subscription.name.toLowerCase().includes("week")) {
+      const subscriptionName = subscription.name.toLowerCase();
+
+      if (subscriptionName.includes("weekly")) {
         endDate.setDate(endDate.getDate() + 7);
-      } else if (subscription.name.toLowerCase().includes("month")) {
+      } else if (subscriptionName.includes("monthly")) {
         endDate.setMonth(endDate.getMonth() + 1);
-      } else if (subscription.name.toLowerCase().includes("year")) {
+      } else if (subscriptionName.includes("yearly")) {
         endDate.setFullYear(endDate.getFullYear() + 1);
       }
 
+      // Create subscription record
       const subscriptionUser = await prisma.subscriptionUser.create({
         data: {
           userId,
-          subscriptionId,
+          subscriptionId: subscription.id, // Use the found subscription's ID
           type,
           startDate: new Date(),
           endDate,
@@ -103,6 +116,7 @@ const subscriptionController = {
         },
       });
 
+      // Create Stripe checkout session
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [
@@ -111,8 +125,9 @@ const subscriptionController = {
               currency: "usd",
               product_data: {
                 name: subscription.name,
+                description: `Subscription: ${subscription.name} (${type})`,
               },
-              unit_amount: price * 100,
+              unit_amount: Math.round(price * 100),
             },
             quantity: 1,
           },
@@ -121,23 +136,27 @@ const subscriptionController = {
         metadata: {
           subscriptionUserId: subscriptionUser.id,
           userId: userId,
-          subscriptionId: subscriptionId,
+          subscriptionId: subscription.id,
           type: type,
         },
         success_url: "https://uruyange-coffee-frontend.vercel.app/complete",
         cancel_url: "https://uruyange-coffee-frontend.vercel.app/cancel",
       });
-      res.json({ sessionUrl: session.url });
+
+      return res.json({ sessionUrl: session.url });
     } catch (error) {
       console.error("Error buying subscription:", error);
-      res.status(500).json({ message: "Error buying subscription", error });
+      res.status(500).json({
+        message: "Error buying subscription",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   },
 
   getBoughtSubscription: async (req: Request, res: Response): Promise<void> => {
     try {
       const { userId } = req.params;
-      
+
       // Get all subscriptions bought by the user with subscription details
       const boughtSubscriptions = await prisma.subscriptionUser.findMany({
         where: {
