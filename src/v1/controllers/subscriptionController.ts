@@ -53,6 +53,7 @@ const subscriptionController = {
     try {
       const {
         userId,
+        email,
         subscriptionId,
         subscriptionType,
         type,
@@ -64,7 +65,7 @@ const subscriptionController = {
       } = req.body;
 
       // Validate required fields
-      if (!userId || !subscriptionId || !price) {
+      if (!userId || !email || !subscriptionId || !price) {
         return res.status(400).json({ message: "Missing required fields" });
       }
 
@@ -104,6 +105,7 @@ const subscriptionController = {
       const subscriptionUser = await prisma.subscriptionUser.create({
         data: {
           userId,
+          email, // Added email field
           subscriptionId: subscription.id, // Use the found subscription's ID
           type,
           startDate: new Date(),
@@ -119,6 +121,7 @@ const subscriptionController = {
       // Create Stripe checkout session
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
+        customer_email: email, // Include email in the Stripe session
         line_items: [
           {
             price_data: {
@@ -138,6 +141,7 @@ const subscriptionController = {
           userId: userId,
           subscriptionId: subscription.id,
           type: type,
+          email: email, // Store email in metadata for tracking
         },
         success_url: "https://uruyange-coffee-frontend.vercel.app/complete",
         cancel_url: "https://uruyange-coffee-frontend.vercel.app/cancel",

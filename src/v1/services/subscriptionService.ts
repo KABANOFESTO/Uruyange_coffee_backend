@@ -32,6 +32,7 @@ const subscriptionService = {
         userId: string;
         subscriptionId: string;
         type: string;
+        email?: string; // Added email field
         address?: string;
         city?: string;
         zipCode?: string;
@@ -62,6 +63,7 @@ const subscriptionService = {
                 userId: subscriptionUserData.userId,
                 subscriptionId: subscriptionUserData.subscriptionId,
                 type: subscriptionUserData.type,
+                email: subscriptionUserData.email ?? "", // Added email field
                 startDate: new Date(),
                 endDate,
                 status: "PENDING",
@@ -88,14 +90,6 @@ const subscriptionService = {
         return subscriptions;
     },
 
-    // updateSubscriptionStatus: async (subscriptionUserId: string, status: string) => {
-    //     const updatedSubscription = await prisma.subscriptionUser.update({
-    //         where: { id: subscriptionUserId },
-    //         data: { status: status as SubscriptionStatus } 
-    //     });
-    //     return updatedSubscription;
-    // },
-
     getSubscriptionUserById: async (id: string) => {
         return await prisma.subscriptionUser.findUnique({
             where: { id },
@@ -104,8 +98,7 @@ const subscriptionService = {
                 user: {
                     select: {
                         id: true,
-                        // name: true, // Removed or replaced with a valid property
-                        email: true
+                        email: true // Ensures email is included
                     }
                 }
             }
